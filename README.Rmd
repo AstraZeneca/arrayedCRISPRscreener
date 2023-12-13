@@ -1,0 +1,122 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# arrayedCRISPRscreener
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of arrayedCRISPRscreener is to simulate arrayed CRISPR screening data for the purpose of benchmarking data analysis tools as well as power calculation.
+
+## Installation
+
+You can install arrayedCRISPRscreener from [GitHub](https://github.com/AstraZeneca/arrayedCRISPRscreener) with:
+
+```{r}
+# install.packages("devtools")
+# devtools::install("arrayedCRISPRscreener")
+```
+## Quick start
+
+```{r}
+library(arrayedCRISPRscreener)
+library(ggplot2)
+```
+
+The simulation is designed to run based on a platemap layout. 
+The following are the most basic steps for simulating arrayedCRISPR data using the platemap design. 
+Please note that an example platemap is included in the package. 
+To perform a simulation, users must specify parameters that correspond to various experimental factors. 
+For example, we demonstrate a simulation that only includes the gKO effect, without any additional treatments.
+
+```{r}
+## data frame of platemap layout
+plate_layout <- platemap # example platemap design
+head(plate_layout)
+
+## Number of randomly selected wells with phenotypic effect due to gKO
+n_hit <- 10
+
+## Number of gKO treatment interacting phenotypic effect with other treatment.
+## In this example, we assume there is no additional treatment in the assay
+n_hit_with_interaction <- 0
+
+## Numeric value desired number of cells per well
+desired_cells_per_well <- 1000
+
+## Numeric value baseline endpoint value due to gKO
+base_level <- log(100)
+
+## variation among the negative genes
+sigma_bg0 <- 0.05
+
+## Average gKO effect size as percentage based on the baseline endpoint value
+mu_bg <- 0.2
+
+## Variation of gKO effect
+sigma_bg <- 0.05
+
+## Average effect size of interaction between gKO and other stimulated
+## treatment as percentage based on the baseline endpoint value
+mu_btg <- 0
+
+## Variation of interaction effect
+sigma_btg <- 0
+
+## Coefficient of variation (sig/mu) for the variation between cells within well
+cv_cell <- 0.05
+
+## Measurement error in log scale
+measure_error <- 0.3
+
+## Spatial bias can be included in the simulated data. Example input for
+## spatial biased is included in the package as follow,
+head(wells_with_spatial_bias)
+
+## Data frame specifying the systematic spatial bias
+wells_with_spatial_bias$spatial_bias <-
+  0.2 * wells_with_spatial_bias$spatial_bias
+summary(wells_with_spatial_bias$spatial_bias)
+
+## Simulation for single plate
+sdata <- sim_single_plate(platemap,
+                          n_hit,
+                          n_hit_with_interaction,
+                          desired_cells_per_well,
+                          base_level,
+                          mu_bg,
+                          sigma_bg,
+                          mu_btg,
+                          sigma_btg,
+                          cv_cell,
+                          measure_error,
+                          wells_with_spatial_bias,
+                          sigma_bg0)
+
+head(as.data.frame(sdata))
+```
+
+We can visualized the simulated arrayed CRISPR screen data based on a 384 well-plate in a heatmap. 
+
+```{r, example, fig.width = 7} 
+p <- ggplot(sdata, aes(x = Column, y = Row)) +
+            geom_tile(aes(fill = y), color = "white") +
+            scale_y_discrete(limits = rev(unique(sdata$Row))) +
+            scale_fill_continuous(type = "viridis") +
+            labs(fill = "endpoint.simulated") + theme_bw()
+
+print(p)
+```
+

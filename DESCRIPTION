@@ -1,0 +1,25 @@
+Package: arrayedCRISPRscreener
+Title: Statistical simulation of Arrayed CRISPR screening
+Version: 0.0.0.9000
+Authors@R: 
+    c(person(given = "Xiang", family = "Zhang", email = "xiang.zhang6@astrazeneca.com", role = c("aut", "cre")),
+    person(given = "Chang", family = "Kim", email = "chang.kim@astrzeneca.com", role = "ctb"))
+Description: Arrayed CRISPR screening data simulation with hierarchical model.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports: 
+    dplyr,
+    magrittr,
+    purrr,
+    rlang,
+    stats,
+    tidyr
+Depends: 
+    R (>= 2.10)
+LazyData: true
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
